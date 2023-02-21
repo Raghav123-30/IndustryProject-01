@@ -9,3 +9,13 @@
   font-size: 1rem;
   color: red;
 }
+Input .helperText {
+  font-size: 1rem;
+  color: red;
+}
+
+.error-text{
+  font-size: 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+}

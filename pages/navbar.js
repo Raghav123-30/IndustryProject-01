@@ -12,13 +12,13 @@ export default function App() {
   ];
 
   return (
-     <NextUIProvider >
-      <Navbar isBordered variant="floating" >
+     <NextUIProvider  >
+      <Navbar isBordered variant="static" style={{textTransform:'uppercase'}} >
         <Navbar.Brand>
           <Navbar.Toggle aria-label="toggle navigation" />
           
           <Text b color="inherit" hideIn="xs" css={{marginLeft:'1rem'}}>
-            Pequrel
+            PEQUREL
           </Text>
         </Navbar.Brand>
         <Navbar.Content enableCursorHighlight hideIn="xs" variant="underline">
