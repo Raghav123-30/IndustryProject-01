@@ -1,8 +1,11 @@
 import { margin } from "@mui/system";
 import { Loading, Card, Grid, Table } from "@nextui-org/react";
 import { useState, useEffect } from "react";
-import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
+import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
+
+import IconButton from "@mui/material/IconButton";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 const List = () => {
   const [available, setAvailable] = useState(false);
   const [data, setData] = useState([]);
@@ -55,7 +58,14 @@ const List = () => {
     return (
       <Grid.Container justify="center">
         <Grid xs={10} md={10}>
-          <Card css={{ h: "$24",height : '60vh',padding:'5rem' ,marginTop:'5rem'}}>
+          <Card
+            css={{
+              h: "$24",
+              height: "60vh",
+              padding: "5rem",
+              marginTop: "5rem",
+            }}
+          >
             <Table
               aria-label="Example static collection table"
               css={{
@@ -80,8 +90,12 @@ const List = () => {
                     <Table.Cell align="right">{item.adharNumber}</Table.Cell>
                     <Table.Cell align="right">{item.location}</Table.Cell>
                     <Table.Cell align="right">
+                      <IconButton>
                         <ModeEditOutlineIcon></ModeEditOutlineIcon>
-                        <DeleteIcon style={{marginLeft:'1rem'}}></DeleteIcon>
+                      </IconButton>
+                      <IconButton>
+                        <DeleteIcon style={{ marginLeft: "0.25rem" }} ></DeleteIcon>
+                      </IconButton>
                     </Table.Cell>
                   </Table.Row>
                 ))}
