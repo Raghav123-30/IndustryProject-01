@@ -17,8 +17,8 @@ export default function App() {
         <Navbar.Brand>
           <Navbar.Toggle aria-label="toggle navigation" />
           
-          <Text b color="inherit" hideIn="xs" css={{marginLeft:'1rem'}}>
-            PEQUREL
+          <Text b color="inherit" hideIn="xs" css={{marginLeft:'1.25rem'}}>
+            PEQUREL TECHNOLOGIES
           </Text>
         </Navbar.Brand>
         <Navbar.Content enableCursorHighlight hideIn="xs" variant="underline">

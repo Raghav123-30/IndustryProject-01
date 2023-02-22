@@ -9,6 +9,7 @@ export default async function handler(req, res) {
         await getDocs(operatorCollectionRef).then((snapshots) => {
             snapshots.forEach((doc) => {
                 const document = {
+                    id       : doc.id,
                     fullName : doc.data().fullName,
                     phone : doc.data().phone,
                     adharNumber : doc.data().adharNumber,
