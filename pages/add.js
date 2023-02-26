@@ -1,6 +1,8 @@
 import { Card, Input, Button, Textarea, Radio, css } from "@nextui-org/react";
 import { useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
+
+import React from "react";
 const Add = () => {
   const [fullName, setFullName] = useState("");
   const [fullNameError, setfullNameError] = useState("");
@@ -14,95 +16,119 @@ const Add = () => {
   const [adharNumber, setAdharNumber] = useState("");
   const [adharError, setadharError] = useState("");
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
   const fullNameValidityHandler = () => {
     if (!fullName) {
       setfullNameError("Full Name is required");
       setformisValid(false);
+      return false;
     } else if (fullName.trim().length < 3) {
       setfullNameError("Please enter a valid full name");
       setformisValid(false);
+      return false;
     } else {
       setfullNameError("");
       setformisValid(true);
+      return true;
     }
   };
   const phoneValidityHandler = () => {
     if (!phone) {
       setphoneError("Phone number is required");
       setformisValid(false);
+      return false;
+      return true;
+    } else if (phone.length == 10) {
+      setphoneError("");
+      setformisValid(true);
+      return true;
     } else if (phone.trim().length < 10 || phone.trim().length > 10) {
       setphoneError("Phone number is invalid");
       setformisValid(false);
-    } else {
-      setphoneError("");
-      setformisValid(true);
+      return false;
     }
   };
   const addressValidityHandler = () => {
     if (!address) {
       setaddressError("Address is required");
       setformisValid(false);
+      return false;
     } else if (address.trim().length < 3) {
       setaddressError("Address is invalid");
       setformisValid(false);
+      return false;
     } else {
       setaddressError("");
       setformisValid(true);
+      return true;
     }
   };
   const loctionValidityHandler = () => {
     if (!location) {
       setlocationError("Please choose location to be assigned to the operator");
       setformisValid(false);
+      return false;
     } else {
       setlocationError("");
       setformisValid(true);
+      return true;
     }
   };
   const adharNumberValidityHandler = () => {
     if (!adharNumber) {
       setadharError("Adhar Number is required");
       setformisValid(false);
+      return false;
     } else if (
       adharNumber.trim().length < 16 ||
       adharNumber.trim().length > 16
     ) {
       setadharError("Please enter a valid adhar number");
       setformisValid(false);
+      return false;
     } else {
       setAdharNumber(adharNumber);
       setadharError("");
       setformisValid(true);
+      return true;
     }
   };
   async function handleButtonClick() {
-    fullNameValidityHandler();
-    loctionValidityHandler();
-    phoneValidityHandler();
-    addressValidityHandler();
-    adharNumberValidityHandler();
-    if (!formisValid) {
-      console.log("Cannot continue! as one or more fields are invalid");
-    } else {
-      await fetch('/api/add',{
-        method : 'POST',
-        body : JSON.stringify({
-          fullName : fullName,
-          phone : phone,
-          adharNumber : adharNumber,
-          address : address,
-          location : location
+    fullNameValidityHandler() 
+      loctionValidityHandler() 
+      phoneValidityHandler() 
+      addressValidityHandler() 
+      adharNumberValidityHandler()
+    if (
+      fullNameValidityHandler() &&
+      loctionValidityHandler() &&
+      phoneValidityHandler() &&
+      addressValidityHandler() &&
+      adharNumberValidityHandler()
+    ) {
+      await fetch("/api/add", {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: fullName,
+          phone: phone,
+          adharNumber: adharNumber,
+          address: address,
+          location: location,
+        }),
+      })
+        .then((response) => {
+          return response.json();
         })
-    
-      }).then((response) => {
-        return response.json()
-      }).then((data) => {
-        console.log(data.message);
-        setIsFormSubmitted(true)
-      }).catch((error) => {
-        console.log("failed");
-        setIsFormSubmitted(false);
-      }) 
+        .then((data) => {
+          console.log(data.message);
+          setIsFormSubmitted(true);
+        })
+        .catch((error) => {
+          console.log("failed");
+          setIsFormSubmitted(false);
+        });
+    } else {
+      console.log("Cannot continue! as one or more fields are invalid");
     }
   }
   if (!isFormSubmitted) {

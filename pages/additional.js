@@ -1,5 +1,7 @@
 import { Grid, Card, Text } from "@nextui-org/react";
+
 export default function About() {
+
   const MockItem = ({ text }) => {
     return (
       <Card css={{ h: "$24", $$cardColor: '$colors$success',height:'50vh' }}>
@@ -12,6 +14,7 @@ export default function About() {
     );
   };
   return (
+   
     <Grid.Container gap={3} justify="center">
       <Grid xs={8}  md={4}>
         <MockItem text="item 1 of 3" />
@@ -29,5 +32,6 @@ export default function About() {
         <MockItem text="item 5 of 5" />
       </Grid>
     </Grid.Container>
+    
   );
 }

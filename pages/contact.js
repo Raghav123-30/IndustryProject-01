@@ -1,9 +1,13 @@
 
+import { useState } from "react";
 const Contact = () => {
+  
   return (
+   
     <div>
         Details for contacting developer will be added here
     </div>
+   
   );
 };
 

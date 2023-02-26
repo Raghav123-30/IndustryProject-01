@@ -1,5 +1,8 @@
 import { Grid, Card, Text } from "@nextui-org/react";
+import AppContext from "./AppContext";
+import React from "react";
 export default function Locations() {
+ 
   const MockItem = ({ text }) => {
     return (
       <Card css={{ h: "$24", $$cardColor: '$colors$error',height:'60vh' }}>
@@ -12,6 +15,7 @@ export default function Locations() {
     );
   };
   return (
+   
     <Grid.Container gap={3} justify="center">
       <Grid xs={8}  md={4}>
         <MockItem text="Choose the location here!" />
@@ -24,6 +28,7 @@ export default function Locations() {
       </Grid>
       
     </Grid.Container>
+    
   );
 }
 
