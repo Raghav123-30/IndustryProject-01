@@ -1,6 +1,8 @@
 import { Card, Input, Button, Textarea, Radio, css } from "@nextui-org/react";
 import { useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
+import {auth} from '../firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 import React from "react";
 const Add = () => {
@@ -16,6 +18,38 @@ const Add = () => {
   const [adharNumber, setAdharNumber] = useState("");
   const [adharError, setadharError] = useState("");
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [otpConfirmed, setOtpConfirmed] = useState(false);
+  const [error, setError] = useState('');
+  async function renderOtpVerification(){
+    let flag = 0;
+    const phoneNumber = "+91" + phone;
+    console.log(phoneNumber);
+      const appVerifier = new RecaptchaVerifier('recaptcha-container',{'size':'normal',
+    'callback' : (response) => {
+      console.log("Verifying")
+    }},auth);
+
+    await signInWithPhoneNumber(auth, phoneNumber, appVerifier).then((confirmationResult) => {
+      const otp = prompt("Enter 6 digit code sent to operator's phone");
+      if(confirmationResult.confirm(otp)){
+        console.log("OTP verified successfully");
+
+        flag = 1;
+        
+      }
+      else{
+        setError("Invalid OTP! Try again later");
+        
+      }
+    })
+     
+    if(flag == 1){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
 
   const fullNameValidityHandler = () => {
     if (!fullName) {
@@ -99,6 +133,7 @@ const Add = () => {
       phoneValidityHandler() 
       addressValidityHandler() 
       adharNumberValidityHandler()
+    
     if (
       fullNameValidityHandler() &&
       loctionValidityHandler() &&
@@ -106,27 +141,32 @@ const Add = () => {
       addressValidityHandler() &&
       adharNumberValidityHandler()
     ) {
-      await fetch("/api/add", {
-        method: "POST",
-        body: JSON.stringify({
-          fullName: fullName,
-          phone: phone,
-          adharNumber: adharNumber,
-          address: address,
-          location: location,
-        }),
-      })
-        .then((response) => {
-          return response.json();
+      const result = await renderOtpVerification();
+      console.log("Verified successfully");
+      console.log(result);
+      if(result){
+        await fetch("/api/add", {
+          method: "POST",
+          body: JSON.stringify({
+            fullName: fullName,
+            phone: phone,
+            adharNumber: adharNumber,
+            address: address,
+            location: location,
+          }),
         })
-        .then((data) => {
-          console.log(data.message);
-          setIsFormSubmitted(true);
-        })
-        .catch((error) => {
-          console.log("failed");
-          setIsFormSubmitted(false);
-        });
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data.message);
+            setIsFormSubmitted(true);
+          })
+          .catch((error) => {
+            console.log("failed");
+            setIsFormSubmitted(false);
+          });
+      }
     } else {
       console.log("Cannot continue! as one or more fields are invalid");
     }
@@ -141,6 +181,7 @@ const Add = () => {
           marginTop: "5rem",
         }}
       >
+       
         <Input
           css={{
             marginBottom: "1.5rem",
@@ -219,13 +260,18 @@ const Add = () => {
           size="lg"
           css={{ width: "15%", marginTop: "1rem" }}
           color="success"
-          onPress={handleButtonClick}
+          onPress={() => {
+            
+            handleButtonClick();
+            
+          }}
         >
           Submit
         </Button>
+        <div id='recaptcha-container' style={{margin:'0 auto', marginTop:'1.5rem'}}></div>
       </Card>
     );
-  }
+        }
   if (isFormSubmitted) {
     return (
       <Card
@@ -236,6 +282,7 @@ const Add = () => {
           padding: "5rem",
         }}
       >
+        
         <span>
           <DoneIcon accentHeight="5"></DoneIcon>
           <p>Operator is added successfully!!</p>

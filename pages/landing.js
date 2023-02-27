@@ -1,6 +1,6 @@
 import { AppBar, Toolbar,   Box,BottomNavigation ,BottomNavigationAction} from "@mui/material";
 import { Text, Modal, Input ,Button} from "@nextui-org/react";
-
+import { sha256 } from 'crypto-hash';
 import { useEffect, useState } from "react";
 import { useContext } from "react";
 import AppContext from "./AppContext";
@@ -29,6 +29,9 @@ const LandingPage = () => {
   }
  
   async function submitHandler(){
+    const hashValue = await sha256('technology');
+
+
     try{
         await fetch('/api/signin',{
             method  : 'POST',
@@ -45,8 +48,8 @@ const LandingPage = () => {
 
             if(data.data == true){
                 setLoggedIn(true);
-                Cookies.set("signedIn", true);
-
+               
+                Cookies.set('signedIn', hashValue);
 
             handleLogin();
             }

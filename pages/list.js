@@ -421,7 +421,8 @@ const List = () => {
           
           <Button color='secondary' style={{width:'20%',margin:'0 auto',fontSize:'1.2rem',backgroundColor:'red'}} onClick={() => {
              handleButtonClick();
-             closeHandler();
+             setModified(true);
+            
           }}>confirm</Button>
           </Card>
           }
