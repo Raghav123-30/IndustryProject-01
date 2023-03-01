@@ -20,6 +20,7 @@ import IconButton from "@mui/material/IconButton";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import { async } from "@firebase/util";
+import { Elsie_Swash_Caps } from "@next/font/google";
 
 const List = () => {
   const [fullName, setFullName] = useState("");
@@ -37,41 +38,99 @@ const List = () => {
   const [id, setId] = useState("");
   const { loggedIn, setLoggedIn } = useState();
   const [deleted, setDeleted] = useState(false);
-  const [editionModal,setEditionModal] = useState(false);
-  const [modified , setModified] = useState(false);
+  const [editionModal, setEditionModal] = useState(false);
+  const [modified, setModified] = useState(false);
+  const [goBack, setGoBack] = useState(false);
   const fullNameValidityHandler = () => {
     if (!fullName) {
       setfullNameError("Full Name is required");
       setformisValid(false);
+      return false;
     } else if (fullName.trim().length < 3) {
       setfullNameError("Please enter a valid full name");
       setformisValid(false);
+      return false;
     } else {
       setfullNameError("");
       setformisValid(true);
+      return true;
     }
   };
   const phoneValidityHandler = () => {
     if (!phone) {
       setphoneError("Phone number is required");
       setformisValid(false);
+      return false;
+      return true;
+    } else if (phone.length == 10) {
+      setphoneError("");
+      setformisValid(true);
+      return true;
     } else if (phone.trim().length < 10 || phone.trim().length > 10) {
       setphoneError("Phone number is invalid");
       setformisValid(false);
+      return false;
+    }
+  };
+  const addressValidityHandler = () => {
+    if (!address) {
+      setaddressError("Address is required");
+      setformisValid(false);
+      return false;
+    } else if (address.trim().length < 3) {
+      setaddressError("Address is invalid");
+      setformisValid(false);
+      return false;
     } else {
-      setphoneError("");
+      setaddressError("");
       setformisValid(true);
+      return true;
+    }
+  };
+  const loctionValidityHandler = () => {
+    if (!location) {
+      setlocationError("Please choose location to be assigned to the operator");
+      setformisValid(false);
+      return false;
+    } else {
+      setlocationError("");
+      setformisValid(true);
+      return true;
+    }
+  };
+  const adharNumberValidityHandler = () => {
+    if (!adharNumber) {
+      setadharError("Adhar Number is required");
+      setformisValid(false);
+      return false;
+    } else if (
+      adharNumber.trim().length < 16 ||
+      adharNumber.trim().length > 16
+    ) {
+      setadharError("Please enter a valid adhar number");
+      setformisValid(false);
+      return false;
+    } else {
+      setAdharNumber(adharNumber);
+      setadharError("");
+      setformisValid(true);
+      return true;
     }
   };
   async function handleButtonClick() {
-    fullNameValidityHandler();
-    loctionValidityHandler();
-    phoneValidityHandler();
-    addressValidityHandler();
-    adharNumberValidityHandler();
-    if (!formisValid) {
-      console.log("Cannot continue! as one or more fields are invalid");
-    } else {
+    fullNameValidityHandler() 
+    loctionValidityHandler() 
+    phoneValidityHandler() 
+    addressValidityHandler() 
+    adharNumberValidityHandler()
+  
+  if (
+    fullNameValidityHandler() &&
+    loctionValidityHandler() &&
+    phoneValidityHandler() &&
+    addressValidityHandler() &&
+    adharNumberValidityHandler()
+  )  {
       await fetch("/api/modify", {
         method: "POST",
         body: JSON.stringify({
@@ -88,9 +147,14 @@ const List = () => {
         })
         .then((data) => {
           console.log(data.message);
+          setEditionModal(true);
         });
     }
+    else{
+      console.log("Cannot continue")
+    }
   }
+  
   async function deleteHandler() {
     await fetch("/api/delete", {
       method: "POST",
@@ -105,45 +169,8 @@ const List = () => {
         console.log(data.message);
         setDeleted(true);
       });
-
   }
-  const addressValidityHandler = () => {
-    if (!address) {
-      setaddressError("Address is required");
-      setformisValid(false);
-    } else if (address.trim().length < 3) {
-      setaddressError("Address is invalid");
-      setformisValid(false);
-    } else {
-      setaddressError("");
-      setformisValid(true);
-    }
-  };
-  const loctionValidityHandler = () => {
-    if (!location) {
-      setlocationError("Please choose location to be assigned to the operator");
-      setformisValid(false);
-    } else {
-      setlocationError("");
-      setformisValid(true);
-    }
-  };
-  const adharNumberValidityHandler = () => {
-    if (!adharNumber) {
-      setadharError("Adhar Number is required");
-      setformisValid(false);
-    } else if (
-      adharNumber.trim().length < 16 ||
-      adharNumber.trim().length > 16
-    ) {
-      setadharError("Please enter a valid adhar number");
-      setformisValid(false);
-    } else {
-      setAdharNumber(adharNumber);
-      setadharError("");
-      setformisValid(true);
-    }
-  };
+  
 
   const [available, setAvailable] = useState(false);
   const [data, setData] = useState([]);
@@ -153,7 +180,7 @@ const List = () => {
   const closeHandler = () => {
     setVisibility(false);
     console.log("closed");
-    window.location.reload();
+    
   };
   const [delModalVisible, setDelModalVisible] = useState(false);
   const delModalHandler = () => {
@@ -223,8 +250,7 @@ const List = () => {
           <Grid xs={10} md={10}>
             <Card
               css={{
-                h: "$24",
-                height: "60vh",
+                
                 padding: "5rem",
                 marginTop: "5rem",
               }}
@@ -240,8 +266,8 @@ const List = () => {
                   <Table.Column align="right">Full Name</Table.Column>
                   <Table.Column align="right">Phone Number</Table.Column>
                   <Table.Column align="right">Address</Table.Column>
-                  <Table.Column align="right">Adhar Number</Table.Column>
                   <Table.Column align="right">A3S location</Table.Column>
+                  <Table.Column align="right">Adhar Number</Table.Column>
                   <Table.Column align="right">Actions</Table.Column>
                 </Table.Header>
                 <Table.Body>
@@ -250,8 +276,8 @@ const List = () => {
                       <Table.Cell align="right">{item.fullName}</Table.Cell>
                       <Table.Cell align="right">{item.phone}</Table.Cell>
                       <Table.Cell align="right">{item.address}</Table.Cell>
-                      <Table.Cell align="right">{item.adharNumber}</Table.Cell>
-                      <Table.Cell align="right">{item.location}</Table.Cell>
+                      <Table.Cell align="right">{item.location }</Table.Cell>
+                      <Table.Cell align="right">{item.adharNumber || '    N/A    '}</Table.Cell>
                       <Table.Cell align="right">
                         <IconButton
                           onClick={() => {
@@ -286,12 +312,11 @@ const List = () => {
         </Grid.Container>
         <Modal
           closeButton
-          
           noPadding
           aria-labelledby="modal-title"
           open={visibility}
           onClose={closeHandler}
-          width= "45vw"
+          width="60vw"
         >
           {/* <Modal.Header>
             <Text id="modal-title" size={18}>
@@ -301,141 +326,210 @@ const List = () => {
             </Text>
           </Modal.Header> */}
           <Modal.Body>
-            {!editionModal && 
-            <Card
-            css={{
-             
-            
-              padding: "3rem",
-              // marginTop: "5rem",
-              // marginBottom: "5rem",
-              height:'fit-content'
-            }}
-          >
-            <Input
-              css={{
-                marginBottom: "1.5rem",
-                marginTop: "1rem",
-              }}
-              size="lg"
-              label="Full Name"
-              className="helperText"
-              bordered
-              shadow
-              value={fullName}
-              placeholder="Eg.Raghavendra S Bhat"
-              onChange={(event) => {
-                setFullName(event.target.value);
-              }}
-            ></Input>
-            {fullNameError && (
-              <div style={{ color: "red" }}>{fullNameError}</div>
+            {!editionModal && (
+              <Card
+                css={{
+                  padding: "3rem",
+                  // marginTop: "5rem",
+                  // marginBottom: "5rem",
+                  height: "fit-content",
+                }}
+              >
+                <Input
+                  css={{
+                    marginBottom: "1.5rem",
+                    marginTop: "1rem",
+                  }}
+                  size="lg"
+                  label="Full Name"
+                  className="helperText"
+                  bordered
+                  shadow
+                  value={fullName}
+                  placeholder="Eg.Raghavendra S Bhat"
+                  onChange={(event) => {
+                    setFullName(event.target.value);
+                  }}
+                ></Input>
+                {fullNameError && (
+                  <div style={{ color: "red" }}>{fullNameError}</div>
+                )}
+                <Input
+                  css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
+                  label="Phone"
+                  size="lg"
+                  bordered
+                  shadow
+                  value={phone}
+                  placeholder="Eg.98451XXXXX"
+                  onChange={(event) => {
+                    setPhone(event.target.value);
+                  }}
+                ></Input>
+                {phoneError && <div style={{ color: "red" }}>{phoneError}</div>}
+                <Textarea
+                  css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
+                  rows={4}
+                  size="lg"
+                  label="Address"
+                  value={address}
+                  placeholder="Eg.Navanagar, MIG XXX, Xth Cross"
+                  bordered
+                  shadow
+                  onChange={(event) => {
+                    setAddress(event.target.value);
+                  }}
+                ></Textarea>
+                {addressError && (
+                  <div style={{ color: "red" }}>{addressError}</div>
+                )}
+                <Radio.Group
+                  orientation="horizontal"
+                  label="A3S Location"
+                  defaultValue="success"
+                  css={{ marginBottom: "1.5rem" }}
+                  value={location}
+                  onChange={(event) => {
+                    setLocation(event);
+                  }}
+                >
+                  <Radio value="Annigeri" color="primary">
+                    Annigeri
+                  </Radio>
+                  <Radio value="Kundgol" color="secondary">
+                    Kundgol
+                  </Radio>
+                  <Radio value="Madaganur" color="error">
+                    Madaganur
+                  </Radio>
+                </Radio.Group>
+                {locationError && (
+                  <div style={{ color: "red" }}>{locationError}</div>
+                )}
+                <Input
+                  label="Adhar Number"
+                  placeholder="Eg.XXXXXXXXXXXXXXXX"
+                  css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
+                  onChange={(event) => {
+                    setAdharNumber(event.target.value);
+                  }}
+                  value={adharNumber}
+                  size="lg"
+                  bordered
+                  shadow
+                ></Input>
+                {adharError && <div style={{ color: "red" }}>{adharError}</div>}
+                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around',gap:'1rem'}}>
+                <Button
+                  size="lg"
+                  css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
+                  color="error"
+                  onPress={() => {
+                    
+                    handleButtonClick();
+                  }}
+                >
+                  Update
+                </Button>
+                <Button
+                  color="primary"
+                  size="lg"
+                  css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
+                  onClick={() => {
+                   
+                    closeHandler();
+                  }}
+                >
+                  Go back
+                </Button>
+                </div>
+              </Card>
             )}
-            <Input
-              css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
-              label="Phone"
-              size="lg"
-              bordered
-              shadow
-              value={phone}
-              placeholder="Eg.98451XXXXX"
-              onChange={(event) => {
-                setPhone(event.target.value);
-              }}
-            ></Input>
-            {phoneError && <div style={{ color: "red" }}>{phoneError}</div>}
-            <Textarea
-              css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
-              rows={4}
-              size="lg"
-              label="Address"
-              value={address}
-              placeholder="Eg.Navanagar, MIG XXX, Xth Cross"
-              bordered
-              shadow
-              onChange={(event) => {
-                setAddress(event.target.value);
-              }}
-            ></Textarea>
-            {addressError && (
-              <div style={{ color: "red" }}>{addressError}</div>
+            {editionModal && !modified && (
+              <Card style={{ padding: "2vw" }}>
+                <div
+                  style={{
+                    padding: "2vw",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <ReportProblemSharpIcon
+                    style={{ height: "3.5vh", width: "3.5vw" }}
+                  ></ReportProblemSharpIcon>
+                  <Text style={{ marginBottom: "1.5rem" }} size={20}>
+                    On clicking confirm details of operator will be edited in
+                    the database. Do you like to proceed?
+                  </Text>
+                </div>
+
+                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-evenly',gap:'1rem'}}>
+                <Button
+                  color="error"
+                  style={{
+                    width: "20%",
+                    margin: "0 auto",
+                    fontSize: "1.2rem",
+                   
+                  }}
+                  onClick={() => {
+                    handleButtonClick();
+                    setModified(true);
+                    window.location.reload();
+                  }}
+                >
+                  confirm
+                </Button>
+                <Button
+                  color="primary"
+                  style={{
+                    width: "20%",
+                    margin: "0 auto",
+                    fontSize: "1.2rem",
+                   
+                  }}
+                  onClick={() => {
+                    setModified(false);
+                    setEditionModal(false);
+                  }}
+                >
+                  Go back
+                </Button>
+               
+                </div>
+              </Card>
             )}
-            <Radio.Group
-              orientation="horizontal"
-              label="A3S Location"
-              defaultValue="success"
-              css={{ marginBottom: "1.5rem" }}
-              value={location}
-              onChange={(event) => {
-                setLocation(event);
-              }}
-            >
-              <Radio value="Annigeri" color="primary">
-                Annigeri
-              </Radio>
-              <Radio value="Kundgol" color="secondary">
-                Kundgol
-              </Radio>
-              <Radio value="Madaganur" color="error">
-                Madaganur
-              </Radio>
-            </Radio.Group>
-            {locationError && (
-              <div style={{ color: "red" }}>{locationError}</div>
+            {modified && (
+              <Card
+                style={{
+                  padding: "2vw",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <DoneIcon
+                  style={{
+                    width: "3.5vw",
+                    height: "3.5vh",
+                    background: "green",
+                    color: "whitesmoke",
+                    marginRight: "1.2rem",
+                  }}
+                ></DoneIcon>
+                <Text style={{ fontSize: "1.25rem", color: "red" }}>
+                  Details of operator has been modified successfully
+                </Text>
+              </Card>
             )}
-            <Input
-              label="Adhar Number"
-              placeholder="Eg.XXXXXXXXXXXXXXXX"
-              css={{ marginBottom: "1.5rem", marginTop: "1rem" }}
-              onChange={(event) => {
-                setAdharNumber(event.target.value);
-              }}
-              value={adharNumber}
-              size="lg"
-              bordered
-              shadow
-            ></Input>
-            {adharError && <div style={{ color: "red" }}>{adharError}</div>}
-            <Button
-              size="lg"
-              css={{ width: "15%",margin:'0 auto', marginTop: "1rem" }}
-              color="success"
-              onPress={() => {
-                setEditionModal(true);
-              }}
-            >
-              Update
-            </Button>
-          </Card>
-          }
-          {editionModal && !modified &&
-          <Card style={{padding:'2vw'}}>
-              
-          <div  style={{padding:'2vw',display:'flex',flexDirection:'row',justifyItems:'center',justifyContent:'center',gap:'0.5rem'}}>
-          <ReportProblemSharpIcon  style={{height:'3.5vh', width:'3.5vw'}}></ReportProblemSharpIcon>
-          <Text style={{marginBottom:'1.5rem'}} size={20}>
-            On clicking confirm details of operator will be edited in the database.
-            Do you like to proceed?
-          </Text>
-          </div>
-          
-          <Button color='secondary' style={{width:'20%',margin:'0 auto',fontSize:'1.2rem',backgroundColor:'red'}} onClick={() => {
-             handleButtonClick();
-             setModified(true);
-            
-          }}>confirm</Button>
-          </Card>
-          }
-          {modified && <Card  style={{padding:'2vw',display:'flex',flexDirection:'row',justifyItems:'center',justifyContent:'center'}}>
-                 <DoneIcon style={{width:'3.5vw', height:'3.5vh',background:'green',color:'whitesmoke',marginRight:'1.2rem'}}></DoneIcon>
-                 <Text style={{fontSize:'1.25rem', color:'red'}}>Details of operator has been modified  successfully</Text>
-                 
-            </Card>}
           </Modal.Body>
         </Modal>
         <Modal
           closeButton
-          
           noPadding
           aria-labelledby="modal-title"
           open={delModalVisible}
@@ -443,26 +537,63 @@ const List = () => {
           width="45vw"
         >
           <Modal.Body>
-            {!deleted && 
-            <Card style={{padding:'2vw'}}>
-              
-            <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between',gap:'0.25rem'}}>
-            <ReportProblemSharpIcon  style={{height:'3.5vh', width:'3.5vw'}}></ReportProblemSharpIcon>
-            <Text style={{marginBottom:'1.5rem'}} size={20}>
-              On clicking confirm operator will be removed from the database.
-              Do you like to proceed?
-            </Text>
-            </div>
-            
-            <Button  style={{width:'20%',fontSize:'1.25rem',background:'red', color:'white',margin:'0 auto'}} onClick={deleteHandler}>confirm</Button>
-          </Card>}
-          {deleted && 
-          <Card  style={{padding:'2vw',display:'flex',flexDirection:'row',justifyItems:'center',justifyContent:'center'}}>
-                 <DoneIcon style={{width:'3.5vw', height:'3.5vh',background:'green',color:'whitesmoke',marginRight:'1.2rem'}}></DoneIcon>
-                 <Text style={{fontSize:'1.25rem', color:'red'}}>Operator has been removed successfully</Text>
-                 
-            </Card>
-            }
+            {!deleted && (
+              <Card style={{ padding: "2vw" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    gap: "0.25rem",
+                  }}
+                >
+                  <ReportProblemSharpIcon
+                    style={{ height: "3.5vh", width: "3.5vw" }}
+                  ></ReportProblemSharpIcon>
+                  <Text style={{ marginBottom: "1.5rem" }} size={20}>
+                    On clicking confirm operator will be removed from the
+                    database. Do you like to proceed?
+                  </Text>
+                </div>
+
+                <Button
+                  style={{
+                    width: "20%",
+                    fontSize: "1.25rem",
+                    background: "red",
+                    color: "white",
+                    margin: "0 auto",
+                  }}
+                  onClick={deleteHandler}
+                >
+                  confirm
+                </Button>
+              </Card>
+            )}
+            {deleted && (
+              <Card
+                style={{
+                  padding: "2vw",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <DoneIcon
+                  style={{
+                    width: "3.5vw",
+                    height: "3.5vh",
+                    background: "green",
+                    color: "whitesmoke",
+                    marginRight: "1.2rem",
+                  }}
+                ></DoneIcon>
+                <Text style={{ fontSize: "1.25rem", color: "red" }}>
+                  Operator has been removed successfully
+                </Text>
+              </Card>
+            )}
           </Modal.Body>
         </Modal>
       </div>

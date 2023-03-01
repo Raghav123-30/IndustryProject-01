@@ -11,6 +11,15 @@ import Cookies from "js-cookie";
 import { useState } from "react";
 import { sha256 } from 'crypto-hash';
 
+
+const darkTheme = createTheme({
+  type: 'dark',
+  theme: {
+    // override dark theme colors
+  }
+});
+
+
 export default function App({ Component, pageProps }) {
   const [wait, setWait] = useState(true);
   const [loggedIn, setLoggedIn] = React.useState(false);
@@ -39,7 +48,7 @@ export default function App({ Component, pageProps }) {
   }, []);
  
   return (
-    <NextUIProvider>
+    <NextUIProvider >
       <AppContext.Provider value={{ loggedIn, setLoggedIn }}>
         {wait ? (
           <Grid.Container css={{marginTop:'50%'}}>

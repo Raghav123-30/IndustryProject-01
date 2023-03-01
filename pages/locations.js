@@ -5,7 +5,7 @@ export default function Locations() {
  
   const MockItem = ({ text }) => {
     return (
-      <Card css={{ h: "$24", $$cardColor: '$colors$error',height:'60vh' }}>
+      <Card css={{ h: "$24", $$cardColor: '$colors$white',height:'60vh' }}>
         <Card.Body>
           <Text h6 size={15} color="white" css={{ mt: 0 }}>
             {text}

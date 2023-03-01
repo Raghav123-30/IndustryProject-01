@@ -4,7 +4,7 @@ export default function About() {
 
   const MockItem = ({ text }) => {
     return (
-      <Card css={{ h: "$24", $$cardColor: '$colors$success',height:'50vh' }}>
+      <Card css={{ h: "$24", $$cardColor: '$colors$white',height:'50vh' }}>
         <Card.Body>
           <Text h6 size={15} color="white" css={{ mt: 0 }}>
             {text}
