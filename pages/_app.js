@@ -12,6 +12,9 @@ import { useState } from "react";
 import { sha256 } from 'crypto-hash';
 
 
+React.useLayoutEffect = React.useEffect 
+
+
 const darkTheme = createTheme({
   type: 'dark',
   theme: {
@@ -24,7 +27,7 @@ export default function App({ Component, pageProps }) {
   const [wait, setWait] = useState(true);
   const [loggedIn, setLoggedIn] = React.useState(false);
 
-  useEffect(() => {
+React.useLayoutEffect(() => {
     async function handle(){
       const hash = Cookies.get("signedIn");
       await fetch('/api/verifyUser',{

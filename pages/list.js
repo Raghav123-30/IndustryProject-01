@@ -22,6 +22,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { async } from "@firebase/util";
 import { Elsie_Swash_Caps } from "@next/font/google";
 
+
+
 const List = () => {
   const [fullName, setFullName] = useState("");
   const [fullNameError, setfullNameError] = useState("");

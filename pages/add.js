@@ -1,9 +1,9 @@
 import { Card, Input, Button, Textarea, Radio, css } from "@nextui-org/react";
 import { useState } from "react";
 import DoneIcon from "@mui/icons-material/Done";
-import {auth} from '../firebase';
+import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-
+import { Modal } from "@nextui-org/react";
 import React from "react";
 const Add = () => {
   const [fullName, setFullName] = useState("");
@@ -18,39 +18,114 @@ const Add = () => {
   const [adharNumber, setAdharNumber] = useState("");
   const [adharError, setadharError] = useState("");
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [otpRequested, setOtpRequested] = useState(false);
   const [otpConfirmed, setOtpConfirmed] = useState(false);
-  const [error, setError] = useState('');
-  async function renderOtpVerification(){
+  const [otp, setOtp] = useState();
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState("");
+  const [confirmFunction, setConfirmFunction] = useState(null);
+  const [otpResponse, setOtpResponse] = useState();
+  const [requestMessage, setRequestMessage] = useState('');
+  const otpHandler = () => setOtpRequested(true);
+  const closeOtpHandler = () => setOtpRequested(false);
+  async function renderOtpVerification() {
     let flag = 0;
     const phoneNumber = "+91" + phone;
     console.log(phoneNumber);
-      const appVerifier = new RecaptchaVerifier('recaptcha-container',{'size':'normal',
-    'callback' : (response) => {
-      console.log("Verifying")
-    }},auth);
+    const appVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: (response) => {
+          console.log("Verifying");
+        },
+      },
+      auth
+    );
 
-    await signInWithPhoneNumber(auth, phoneNumber, appVerifier).then((confirmationResult) => {
-      const otp = prompt("Enter 6 digit code sent to operator's phone");
-      if(confirmationResult.confirm(otp)){
-        console.log("OTP verified successfully");
+    await signInWithPhoneNumber(auth, phoneNumber, appVerifier).then(
+      (confirmationResult) => {
+        try{
+          setConfirmFunction(confirmationResult);
+        }
+        catch{
+          console.log("Something went wrong");
+        }
+      }
+    ).catch(() => {
+      setOtpRequested(false);
+      setRequestMessage("Too many OTP requested for the same phone number! please try again after some time");
+    });
+    // const otp = prompt("Enter 6 digit code sent to operator's phone");
+    // if(confirmationResult.confirm(otp)){
+    //   console.log("OTP verified successfully");
 
-        flag = 1;
-        
-      }
-      else{
-        setError("Invalid OTP! Try again later");
-        
-      }
-    })
-     
-    if(flag == 1){
-      return true;
-    }
-    else{
-      return false;
-    }
+    //   flag = 1;
+
+    // }
+    // else{
+    //   setError("Invalid OTP! Try again later");
+
+    // }
+    //})
+
+    // if(flag == 1){
+    //   return true;
+    // }
+    // else{
+    //   return false;
+    // }
   }
 
+  // const validateOtp = () => {
+  //   if (!verified) {
+  //     console.log(`Entered OTP was ${otp}`)
+  //     try{ 
+  //       confirmFunction.confirm(otp) 
+  //       console.log("OTP verified successfully");
+
+  //       setVerified(true);
+  //       submitToFirestore();
+
+  //       return true;
+  //     } catch{
+  //       console.log(
+  //         `Entered OTP ${otp} did not match with the one sent from the server! Please try again`
+  //       );
+  //       setOtpResponse("OTP is invalid");
+  //       return false;
+  //     }
+  //   }
+  // };
+  async function validateOtp() {
+    if (!verified) {
+      console.log(`Entered OTP was ${otp}`);
+      try {
+        await confirmFunction.confirm(otp)
+        console.log("OTP verified successfully");
+  
+          setVerified(true);
+          submitToFirestore();
+          return true;
+        
+        
+  
+       
+      } catch (error) {
+        if (error.code === "auth/invalid-verification-code") {
+          console.log(
+            `Entered OTP ${otp} did not match with the one sent from the server! Please try again`
+          );
+          setOtpResponse("OTP is invalid");
+        } else {
+          console.log("An error occurred while verifying the OTP:", error);
+          setOtpResponse("An error occurred while verifying the OTP");
+        }
+        return false;
+      }
+    }
+  };
+  
   const fullNameValidityHandler = () => {
     if (!fullName) {
       setfullNameError("Full Name is required");
@@ -71,7 +146,6 @@ const Add = () => {
       setphoneError("Phone number is required");
       setformisValid(false);
       return false;
-      return true;
     } else if (phone.length == 10) {
       setphoneError("");
       setformisValid(true);
@@ -127,13 +201,13 @@ const Add = () => {
       return true;
     }
   };
-  async function handleButtonClick() {
-    fullNameValidityHandler() 
-      loctionValidityHandler() 
-      phoneValidityHandler() 
-      addressValidityHandler() 
-      adharNumberValidityHandler()
-    
+  const validateForm = () => {
+    fullNameValidityHandler();
+    loctionValidityHandler();
+    phoneValidityHandler();
+    addressValidityHandler();
+    adharNumberValidityHandler();
+
     if (
       fullNameValidityHandler() &&
       loctionValidityHandler() &&
@@ -141,32 +215,38 @@ const Add = () => {
       addressValidityHandler() &&
       adharNumberValidityHandler()
     ) {
-      const result = await renderOtpVerification();
-      console.log("Verified successfully");
-      console.log(result);
-      if(result){
-        await fetch("/api/add", {
-          method: "POST",
-          body: JSON.stringify({
-            fullName: fullName,
-            phone: phone,
-            adharNumber: adharNumber,
-            address: address,
-            location: location,
-          }),
+      setformisValid(true);
+      setOtpRequested(true);
+      renderOtpVerification();
+      return true;
+    } else {
+      setformisValid(false);
+      return false;
+    }
+  };
+  async function submitToFirestore() {
+    if (formisValid) {
+      await fetch("/api/add", {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: fullName,
+          phone: phone,
+          adharNumber: adharNumber,
+          address: address,
+          location: location,
+        }),
+      })
+        .then((response) => {
+          return response.json();
         })
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            console.log(data.message);
-            setIsFormSubmitted(true);
-          })
-          .catch((error) => {
-            console.log("failed");
-            setIsFormSubmitted(false);
-          });
-      }
+        .then((data) => {
+          console.log(data.message);
+          setIsFormSubmitted(true);
+        })
+        .catch((error) => {
+          console.log("failed");
+          setIsFormSubmitted(false);
+        });
     } else {
       console.log("Cannot continue! as one or more fields are invalid");
     }
@@ -181,7 +261,6 @@ const Add = () => {
           marginTop: "5rem",
         }}
       >
-       
         <Input
           css={{
             marginBottom: "1.5rem",
@@ -261,17 +340,40 @@ const Add = () => {
           css={{ width: "15%", marginTop: "1rem" }}
           color="success"
           onPress={() => {
-            
-            handleButtonClick();
-            
+            validateForm();
           }}
         >
           Submit
         </Button>
-        <div id='recaptcha-container' style={{margin:'0 auto', marginTop:'1.5rem'}}></div>
+        <p style={{textAlign:'center', color:'red', textTransform:'capitalize'}}>{requestMessage}</p>
+        <div
+          id="recaptcha-container"
+          style={{ margin: "0 auto", marginTop: "1.5rem" }}
+        ></div>
+        <Modal
+          closeButton
+          aria-labelledby="modal-title"
+          open={otpRequested}
+          onClose={closeOtpHandler}
+          width="30vw"
+        >
+          <Modal.Body>
+            <Input label="OTP" required placeholder="XXXXXXX" onChange={(event) => {
+              setOtp(event.target.value)
+            }}></Input>
+            <Button
+              color="secondary"
+              onPress={validateOtp}
+              css={{ width: "15%", margin: "0 auto", marginTop: "0.25rem" }}
+            >
+              Submit
+            </Button>
+            <p style={{textAlign:'center', color:'red', textTransform:'uppercase'}}> {otpResponse}</p>
+          </Modal.Body>
+        </Modal>
       </Card>
     );
-        }
+  }
   if (isFormSubmitted) {
     return (
       <Card
@@ -282,7 +384,6 @@ const Add = () => {
           padding: "5rem",
         }}
       >
-        
         <span>
           <DoneIcon accentHeight="5"></DoneIcon>
           <p>Operator is added successfully!!</p>
