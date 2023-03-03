@@ -190,7 +190,7 @@ const List = () => {
   };
   const closedelModalHandler = () => {
     setDelModalVisible(false);
-    window.location.reload();
+   
   };
   const modify = (key) => {
     const documentToModify = data.find((doc) => doc.phone === key);
@@ -318,7 +318,7 @@ const List = () => {
           aria-labelledby="modal-title"
           open={visibility}
           onClose={closeHandler}
-          width="60vw"
+          width="60%"
         >
           {/* <Modal.Header>
             <Text id="modal-title" size={18}>
@@ -558,18 +558,36 @@ const List = () => {
                   </Text>
                 </div>
 
-                <Button
+                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
+                <Button color="primary"
                   style={{
                     width: "20%",
                     fontSize: "1.25rem",
-                    background: "red",
+                    
                     color: "white",
                     margin: "0 auto",
                   }}
-                  onClick={deleteHandler}
+                  onClick={closedelModalHandler}
                 >
-                  confirm
+                  Go back
                 </Button>
+                <Button color="success"
+                  style={{
+                    width: "20%",
+                    fontSize: "1.25rem",
+                   
+                    color: "white",
+                    margin:'0 auto',
+                    marginLeft:'1.5rem'
+                  }}
+                  onClick={() => {
+                    deleteHandler();
+                    window.location.reload();
+                  }}
+                >
+                  Confirm
+                </Button>
+                </div>
               </Card>
             )}
             {deleted && (

@@ -12,10 +12,15 @@ export default function App() {
   return (
     <AppContext.Provider value={{ loggedIn, setLoggedIn }}>
       <NextUIProvider>
+        <div style={{backgroundColor:'#EAF4FF' }}>
         <Navbar
-          isBordered
+          
           variant="static"
-          style={{ textTransform: "uppercase" }}
+          style={{ textTransform: "uppercase"}}
+          css={{
+            $$navbarBackgroundColor: "#EAF4FF",
+            $$navbarBlurBackgroundColor: "#EAF4FF"
+          }}
         >
           <Navbar.Brand>
             <Navbar.Toggle aria-label="toggle navigation" />
@@ -48,6 +53,17 @@ export default function App() {
             </Navbar.Item>
           </Navbar.Content>
           <Navbar.Collapse>
+          <Navbar.CollapseItem>
+              <Link
+                color="inherit"
+                css={{
+                  minWidth: "100%",
+                }}
+                href="addloc"
+              >
+                Add A3S
+              </Link>
+              </Navbar.CollapseItem>
             <Navbar.CollapseItem>
               <Link
                 color="inherit"
@@ -87,6 +103,7 @@ export default function App() {
             </Navbar.CollapseItem>
           </Navbar.Collapse>
         </Navbar>
+        </div>
       </NextUIProvider>
     </AppContext.Provider>
   );

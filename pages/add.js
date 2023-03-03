@@ -19,13 +19,13 @@ const Add = () => {
   const [adharError, setadharError] = useState("");
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [otpRequested, setOtpRequested] = useState(false);
-  const [otpConfirmed, setOtpConfirmed] = useState(false);
+
   const [otp, setOtp] = useState();
   const [verified, setVerified] = useState(false);
-  const [error, setError] = useState("");
+
   const [confirmFunction, setConfirmFunction] = useState(null);
   const [otpResponse, setOtpResponse] = useState();
-  const [requestMessage, setRequestMessage] = useState('');
+  const [requestMessage, setRequestMessage] = useState("");
   const otpHandler = () => setOtpRequested(true);
   const closeOtpHandler = () => setOtpRequested(false);
   async function renderOtpVerification() {
@@ -43,74 +43,32 @@ const Add = () => {
       auth
     );
 
-    await signInWithPhoneNumber(auth, phoneNumber, appVerifier).then(
-      (confirmationResult) => {
-        try{
+    await signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        try {
           setConfirmFunction(confirmationResult);
-        }
-        catch{
+        } catch {
           console.log("Something went wrong");
         }
-      }
-    ).catch(() => {
-      setOtpRequested(false);
-      setRequestMessage("Too many OTP requested for the same phone number! please try again after some time");
-    });
-    // const otp = prompt("Enter 6 digit code sent to operator's phone");
-    // if(confirmationResult.confirm(otp)){
-    //   console.log("OTP verified successfully");
-
-    //   flag = 1;
-
-    // }
-    // else{
-    //   setError("Invalid OTP! Try again later");
-
-    // }
-    //})
-
-    // if(flag == 1){
-    //   return true;
-    // }
-    // else{
-    //   return false;
-    // }
+      })
+      .catch(() => {
+        setOtpRequested(false);
+        setRequestMessage(
+          "Too many OTP requested for the same phone number! please try again after some time"
+        );
+      });
   }
 
-  // const validateOtp = () => {
-  //   if (!verified) {
-  //     console.log(`Entered OTP was ${otp}`)
-  //     try{ 
-  //       confirmFunction.confirm(otp) 
-  //       console.log("OTP verified successfully");
-
-  //       setVerified(true);
-  //       submitToFirestore();
-
-  //       return true;
-  //     } catch{
-  //       console.log(
-  //         `Entered OTP ${otp} did not match with the one sent from the server! Please try again`
-  //       );
-  //       setOtpResponse("OTP is invalid");
-  //       return false;
-  //     }
-  //   }
-  // };
   async function validateOtp() {
     if (!verified) {
       console.log(`Entered OTP was ${otp}`);
       try {
-        await confirmFunction.confirm(otp)
+        await confirmFunction.confirm(otp);
         console.log("OTP verified successfully");
-  
-          setVerified(true);
-          submitToFirestore();
-          return true;
-        
-        
-  
-       
+
+        setVerified(true);
+        submitToFirestore();
+        return true;
       } catch (error) {
         if (error.code === "auth/invalid-verification-code") {
           console.log(
@@ -124,8 +82,8 @@ const Add = () => {
         return false;
       }
     }
-  };
-  
+  }
+
   const fullNameValidityHandler = () => {
     if (!fullName) {
       setfullNameError("Full Name is required");
@@ -255,10 +213,11 @@ const Add = () => {
     return (
       <Card
         css={{
-          width: "80%",
+          width: "50%",
           margin: "0 auto",
           padding: "3rem",
           marginTop: "5rem",
+          marginBottom:"5rem"
         }}
       >
         <Input
@@ -338,14 +297,23 @@ const Add = () => {
         <Button
           size="lg"
           css={{ width: "15%", marginTop: "1rem" }}
-          color="success"
+          color="primary"
           onPress={() => {
             validateForm();
           }}
         >
           Submit
         </Button>
-        <p style={{textAlign:'center', color:'red', textTransform:'capitalize'}}>{requestMessage}</p>
+        <p
+          style={{
+            textAlign: "center",
+            color: "red",
+            textTransform: "uppercase",
+            fontSize: "1rem",
+          }}
+        >
+          {requestMessage}
+        </p>
         <div
           id="recaptcha-container"
           style={{ margin: "0 auto", marginTop: "1.5rem" }}
@@ -358,17 +326,32 @@ const Add = () => {
           width="30vw"
         >
           <Modal.Body>
-            <Input label="OTP" required placeholder="XXXXXXX" onChange={(event) => {
-              setOtp(event.target.value)
-            }}></Input>
+            <Input
+              label="OTP"
+              required
+              placeholder="XXXXXXX"
+              onChange={(event) => {
+                setOtp(event.target.value);
+              }}
+            ></Input>
             <Button
-              color="secondary"
+             
               onPress={validateOtp}
-              css={{ width: "15%", margin: "0 auto", marginTop: "0.25rem" }}
+              css={{  width:'40%',margin:'0 auto', marginTop:'1rem',marginBottom:'1rem' }}
             >
               Submit
             </Button>
-            <p style={{textAlign:'center', color:'red', textTransform:'uppercase'}}> {otpResponse}</p>
+            <p
+              style={{
+                textAlign: "center",
+                color: "red",
+                textTransform: "uppercase",
+                fontSize: "1rem",
+              }}
+            >
+              {" "}
+              {otpResponse}
+            </p>
           </Modal.Body>
         </Modal>
       </Card>
@@ -378,16 +361,19 @@ const Add = () => {
     return (
       <Card
         css={{
-          width: "50vw",
+          width: "25vw",
           margin: "0 auto",
           marginTop: "5rem",
-          padding: "5rem",
+          padding: "3rem",
         }}
+       
       >
-        <span>
-          <DoneIcon accentHeight="5"></DoneIcon>
-          <p>Operator is added successfully!!</p>
-        </span>
+        
+          <div  style={{display:'flex', flexDirection:'row',justifyItems:'center', alignItems:'center', gap:'10%'}}>
+          <DoneIcon accentHeight="5" style={{width:'1.75rem', height:'1.75rem',backgroundColor:'green',color:'white'}}></DoneIcon>
+          <p style={{fontSize:'1.25rem'}}>Operator is added successfully!!</p>
+          </div>
+        
       </Card>
     );
   }

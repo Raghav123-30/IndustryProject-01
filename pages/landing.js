@@ -101,56 +101,54 @@ const LandingPage = () => {
   return (
     <>
       <AppContext.Provider value={{ loggedIn, setLoggedIn }}>
-        <Box>
-          <AppBar style={{ backgroundColor: "#00e676" }}>
+       
+          <AppBar style={{ backgroundColor: "#EAF4FF" }}>
             <Toolbar
               css={{ position: "relative", backgroundColor: "$green500" }}
             >
               <div style={{ position: "absolute", left: "2%" }}>
-                <p style={{ color: "black", letterSpacing: "0.15rem" }}>
+                <p style={{ color: "black", letterSpacing: "0.1rem" }}>
                   PEQUREL TECHNOLOGIES
                 </p>
               </div>
               <div style={{ position: "absolute", right: "15rem" }}>
                 <Button
-                  css={{
-                    background: "$white",
-                    color: "Black",
-                    fontSize: "1.15rem",
-                  }}
+               
+                    animated
+                    rounded
+                    
+                    css = {{fontFamily:'$sans'}}
                   onClick={() => {
                     setMessage("");
                     setVisibility(true);
                     console.log("Modal should be visible by now");
                   }}
                 >
-                  SIGN IN
+                  LOGIN
                 </Button>
               </div>
               <div style={{ position: "absolute", right: "2rem" }}>
                 <Button
-                  css={{
-                    background: "$white",
-                    color: "Black",
-                    fontSize: "1.15rem",
-                  }}
+                 animated
+                 rounded
+                 
                 >
                   CONTACT
                 </Button>
               </div>
             </Toolbar>
           </AppBar>
-        </Box>
+        
         <Modal
           closeButton
-          blur
+         
           style={{ padding: "1rem" }}
           aria-labelledby="modal-title"
           open={visible}
           onClose={() => {
             setVisibility(false);
           }}
-          width="35%"
+          width="35vw"
         >
           <Modal.Body>
             <Input
@@ -172,24 +170,26 @@ const LandingPage = () => {
               type="password"
             ></Input>
             <Button
-              css={{ background: "$green500", color: "$black", width: "15%" }}
+             color="primary"
+             animated
+              css={{  width:'40%',margin:'0 auto', marginTop:'1rem',marginBottom:'1rem' }}
               onClick={submitHandler}
             >
-              Sign In
+              Login
             </Button>
-            <div style={{ color: "red" , textTransform:'uppercase'}}>{message}</div>
+            <div style={{ color: "red" , textTransform:'uppercase', margin:'0 auto'}}>{message}</div>
           </Modal.Body>
         </Modal>
       </AppContext.Provider>
 
-      <Grid.Container gap={3} justify="center" css={{ marginTop: "20vh" }}>
+      {/* <Grid.Container gap={3} justify="center" css={{ marginTop: "20vh" }}>
         <Grid xs={6} md={6}>
           <MockItem />
         </Grid>
         <Grid xs={6} md={6}>
           <MockItem />
         </Grid>
-      </Grid.Container>
+      </Grid.Container> */}
       <BottomNavigation
         showLabels
         value={value}
@@ -199,7 +199,7 @@ const LandingPage = () => {
       >
         <BottomNavigationAction
           label="Copyright and other details will come here"
-          style={{ marginTop: "10vh", fontSize: "2rem" }}
+          style={{ marginTop: "95vh", fontSize: "2rem" }}
         ></BottomNavigationAction>
       </BottomNavigation>
     </>
