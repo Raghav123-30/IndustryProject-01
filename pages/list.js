@@ -19,9 +19,9 @@ import DoneIcon from "@mui/icons-material/Done";
 import IconButton from "@mui/material/IconButton";
 
 import DeleteIcon from "@mui/icons-material/Delete";
-import { async } from "@firebase/util";
-import { Elsie_Swash_Caps } from "@next/font/google";
 
+import { auth } from "../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 
 const List = () => {
@@ -43,6 +43,78 @@ const List = () => {
   const [editionModal, setEditionModal] = useState(false);
   const [modified, setModified] = useState(false);
   const [goBack, setGoBack] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [otphandlervisible, setotphandlervisible] = useState(false);
+  const [otp, setOtp] = useState();
+  const [confirmFunction, setConfirmFunction] = useState();
+  const [otpText, setOtpText] = useState('');
+  const [added, setAdded] = useState(false);
+  const [newPhone, setnewPhone] = useState('');
+  const [requestMessage, setRequestMessage] = useState('');
+  const otpcloseHandler = () => {
+    setotphandlervisible(false);
+  };
+  async function renderOtpVerification() {
+    let flag = 0;
+    const phoneNumber = "+91" + phone;
+    console.log(phoneNumber);
+    const appVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: (response) => {
+          console.log("Verifying");
+        },
+      },
+      auth
+    );
+
+    await signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        try {
+          setConfirmFunction(confirmationResult);
+          
+        } catch {
+          console.log("Something went wrong");
+        }
+      })
+      .catch(() => {
+        
+        setRequestMessage(
+          "Too many OTP requested for the same phone number! please try again after some time"
+        );
+        setotphandlervisible(false);
+      });
+  }
+
+  
+  async function validateOtp() {
+    if (!verified) {
+      console.log(`Entered OTP was ${otp}`);
+      try {
+        await confirmFunction.confirm(otp);
+        console.log("OTP verified successfully");
+
+        setVerified(true);
+        submitToFirestore();
+        setotphandlervisible(false);
+        setModified(true);
+        return true;
+      } catch (error) {
+        if (error.code === "auth/invalid-verification-code") {
+          console.log(
+            `Entered OTP ${otp} did not match with the one sent from the server! Please try again`
+          );
+          setOtpText("OTP is invalid");
+        } else {
+          console.log("An error occurred while verifying the OTP:", error);
+          setOtpText("An error occurred while verifying the OTP");
+        }
+        return false;
+      }
+    }
+  }
+
   const fullNameValidityHandler = () => {
     if (!fullName) {
       setfullNameError("Full Name is required");
@@ -73,7 +145,14 @@ const List = () => {
       setformisValid(false);
       return false;
     }
+  
   };
+  const checkfornewPhone = () => {
+        if(phone == newPhone){
+          return false;
+        }
+        return true;
+  }
   const addressValidityHandler = () => {
     if (!address) {
       setaddressError("Address is required");
@@ -119,7 +198,35 @@ const List = () => {
       return true;
     }
   };
-  async function handleButtonClick() {
+  async function submitToFirestore(){
+    if(validateInputs()){
+      try{
+        await fetch("/api/modify", {
+          method: "POST",
+          body: JSON.stringify({
+            id: id,
+            fullName: fullName,
+            phone: phone,
+            adharNumber: adharNumber,
+            location: location,
+            address: address,
+          }),
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data.message);
+            setEditionModal(true);
+          });
+      }
+      catch{
+        console.log("Something went wrong!");
+      }
+      }
+    }
+  
+  async function validateInputs() {
     fullNameValidityHandler() 
     loctionValidityHandler() 
     phoneValidityHandler() 
@@ -133,27 +240,10 @@ const List = () => {
     addressValidityHandler() &&
     adharNumberValidityHandler()
   )  {
-      await fetch("/api/modify", {
-        method: "POST",
-        body: JSON.stringify({
-          id: id,
-          fullName: fullName,
-          phone: phone,
-          adharNumber: adharNumber,
-          location: location,
-          address: address,
-        }),
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data.message);
-          setEditionModal(true);
-        });
+      return true;
     }
     else{
-      console.log("Cannot continue")
+       return false;
     }
   }
   
@@ -288,8 +378,9 @@ const List = () => {
                             setAdharNumber(item.adharNumber);
                             setLocation(item.location);
                             setPhone(item.phone);
-                            setId(item.id);
+                            setnewPhone(item.phone)                            
                             handler();
+                            setId(item.id);
                           }}
                         >
                           <ModeEditOutlineIcon></ModeEditOutlineIcon>
@@ -427,8 +518,9 @@ const List = () => {
                   css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
                   color="error"
                   onPress={() => {
+                    setEditionModal(true);
                     
-                    handleButtonClick();
+                   
                   }}
                 >
                   Update
@@ -478,9 +570,18 @@ const List = () => {
                    
                   }}
                   onClick={() => {
-                    handleButtonClick();
-                    setModified(true);
+                    if(!checkfornewPhone()){
+                       
+                      submitToFirestore();
+                      setModified(true);
                     window.location.reload();
+                  }
+                  else{
+                    renderOtpVerification();
+                      setotphandlervisible(true);
+                  }
+                   
+                    
                   }}
                 >
                   confirm
@@ -616,6 +717,41 @@ const List = () => {
             )}
           </Modal.Body>
         </Modal>
+        <div id="recaptcha-container"></div>
+       
+          <Modal
+            closeButton
+            aria-labelledby="modal-title"
+            open={otphandlervisible}
+            onClose={otpcloseHandler}
+            width="30vw"
+          >
+            <Modal.Body>
+              <Input
+                label="OTP"
+                placeholder="XXXXXX"
+                onChange={(event) => {
+                  setOtp(event.target.value);
+                }}
+              ></Input>
+              <Button
+                color="primary"
+                css={{  width:'40%',margin:'0 auto', marginTop:'1rem',marginBottom:'1rem' }}
+                onPress={() => {
+                  validateOtp();
+                  
+                }}
+              >
+                Submit
+              </Button>
+              <p style={{color:'red',marginTop:'1rem', fontSize:'1.2rem', textTransform:'uppercase',textAlign:'center'}}>{otpText}</p>
+             
+            </Modal.Body>
+          </Modal>
+          
+              
+          <p style={{color:'red',marginTop:'1rem', fontSize:'1.5rem', textTransform:'uppercase',textAlign:'center'}}>{requestMessage}</p>
+       
       </div>
     );
   }

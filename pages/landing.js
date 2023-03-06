@@ -141,14 +141,14 @@ const LandingPage = () => {
         
         <Modal
           closeButton
-         
+           blur
           style={{ padding: "1rem" }}
           aria-labelledby="modal-title"
           open={visible}
           onClose={() => {
             setVisibility(false);
           }}
-          width="35vw"
+          width="30vw"
         >
           <Modal.Body>
             <Input
@@ -172,10 +172,11 @@ const LandingPage = () => {
             <Button
              color="primary"
              animated
-              css={{  width:'40%',margin:'0 auto', marginTop:'1rem',marginBottom:'1rem' }}
+            
+              css={{  marginTop:'1rem',marginBottom:'1rem' }}
               onClick={submitHandler}
             >
-              Login
+              LOGIN
             </Button>
             <div style={{ color: "red" , textTransform:'uppercase', margin:'0 auto'}}>{message}</div>
           </Modal.Body>
