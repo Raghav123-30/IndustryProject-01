@@ -1,4 +1,3 @@
-import { margin, width } from "@mui/system";
 import {
   Loading,
   Card,
@@ -23,7 +22,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-
 const List = () => {
   const [fullName, setFullName] = useState("");
   const [fullNameError, setfullNameError] = useState("");
@@ -47,10 +45,10 @@ const List = () => {
   const [otphandlervisible, setotphandlervisible] = useState(false);
   const [otp, setOtp] = useState();
   const [confirmFunction, setConfirmFunction] = useState();
-  const [otpText, setOtpText] = useState('');
+  const [otpText, setOtpText] = useState("");
   const [added, setAdded] = useState(false);
-  const [newPhone, setnewPhone] = useState('');
-  const [requestMessage, setRequestMessage] = useState('');
+  const [newPhone, setnewPhone] = useState("");
+  const [requestMessage, setRequestMessage] = useState("");
   const otpcloseHandler = () => {
     setotphandlervisible(false);
   };
@@ -73,13 +71,11 @@ const List = () => {
       .then((confirmationResult) => {
         try {
           setConfirmFunction(confirmationResult);
-          
         } catch {
           console.log("Something went wrong");
         }
       })
       .catch(() => {
-        
         setRequestMessage(
           "Too many OTP requested for the same phone number! please try again after some time"
         );
@@ -87,7 +83,6 @@ const List = () => {
       });
   }
 
-  
   async function validateOtp() {
     if (!verified) {
       console.log(`Entered OTP was ${otp}`);
@@ -145,14 +140,13 @@ const List = () => {
       setformisValid(false);
       return false;
     }
-  
   };
   const checkfornewPhone = () => {
-        if(phone == newPhone){
-          return false;
-        }
-        return true;
-  }
+    if (phone == newPhone) {
+      return false;
+    }
+    return true;
+  };
   const addressValidityHandler = () => {
     if (!address) {
       setaddressError("Address is required");
@@ -198,9 +192,9 @@ const List = () => {
       return true;
     }
   };
-  async function submitToFirestore(){
-    if(validateInputs()){
-      try{
+  async function submitToFirestore() {
+    if (validateInputs()) {
+      try {
         await fetch("/api/modify", {
           method: "POST",
           body: JSON.stringify({
@@ -219,34 +213,32 @@ const List = () => {
             console.log(data.message);
             setEditionModal(true);
           });
-      }
-      catch{
+      } catch {
         console.log("Something went wrong!");
       }
-      }
-    }
-  
-  async function validateInputs() {
-    fullNameValidityHandler() 
-    loctionValidityHandler() 
-    phoneValidityHandler() 
-    addressValidityHandler() 
-    adharNumberValidityHandler()
-  
-  if (
-    fullNameValidityHandler() &&
-    loctionValidityHandler() &&
-    phoneValidityHandler() &&
-    addressValidityHandler() &&
-    adharNumberValidityHandler()
-  )  {
-      return true;
-    }
-    else{
-       return false;
     }
   }
-  
+
+  async function validateInputs() {
+    fullNameValidityHandler();
+    loctionValidityHandler();
+    phoneValidityHandler();
+    addressValidityHandler();
+    adharNumberValidityHandler();
+
+    if (
+      fullNameValidityHandler() &&
+      loctionValidityHandler() &&
+      phoneValidityHandler() &&
+      addressValidityHandler() &&
+      adharNumberValidityHandler()
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   async function deleteHandler() {
     await fetch("/api/delete", {
       method: "POST",
@@ -262,7 +254,6 @@ const List = () => {
         setDeleted(true);
       });
   }
-  
 
   const [available, setAvailable] = useState(false);
   const [data, setData] = useState([]);
@@ -270,9 +261,11 @@ const List = () => {
 
   const handler = () => setVisibility(true);
   const closeHandler = () => {
+    if (modified) {
+      setVisibility(false);
+      window.location.reload();
+    }
     setVisibility(false);
-    console.log("closed");
-    
   };
   const [delModalVisible, setDelModalVisible] = useState(false);
   const delModalHandler = () => {
@@ -280,7 +273,6 @@ const List = () => {
   };
   const closedelModalHandler = () => {
     setDelModalVisible(false);
-   
   };
   const modify = (key) => {
     const documentToModify = data.find((doc) => doc.phone === key);
@@ -342,7 +334,6 @@ const List = () => {
           <Grid xs={10} md={10}>
             <Card
               css={{
-                
                 padding: "5rem",
                 marginTop: "5rem",
               }}
@@ -368,8 +359,10 @@ const List = () => {
                       <Table.Cell align="right">{item.fullName}</Table.Cell>
                       <Table.Cell align="right">{item.phone}</Table.Cell>
                       <Table.Cell align="right">{item.address}</Table.Cell>
-                      <Table.Cell align="right">{item.location }</Table.Cell>
-                      <Table.Cell align="right">{item.adharNumber || '    N/A    '}</Table.Cell>
+                      <Table.Cell align="right">{item.location}</Table.Cell>
+                      <Table.Cell align="right">
+                        {item.adharNumber || "    N/A    "}
+                      </Table.Cell>
                       <Table.Cell align="right">
                         <IconButton
                           onClick={() => {
@@ -378,7 +371,7 @@ const List = () => {
                             setAdharNumber(item.adharNumber);
                             setLocation(item.location);
                             setPhone(item.phone);
-                            setnewPhone(item.phone)                            
+                            setnewPhone(item.phone);
                             handler();
                             setId(item.id);
                           }}
@@ -411,13 +404,6 @@ const List = () => {
           onClose={closeHandler}
           width="60%"
         >
-          {/* <Modal.Header>
-            <Text id="modal-title" size={18}>
-              <Text b color="black" size={20} css={{ textAlign: "center" }}>
-                Edit Details
-              </Text>
-            </Text>
-          </Modal.Header> */}
           <Modal.Body>
             {!editionModal && (
               <Card
@@ -512,30 +498,34 @@ const List = () => {
                   shadow
                 ></Input>
                 {adharError && <div style={{ color: "red" }}>{adharError}</div>}
-                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around',gap:'1rem'}}>
-                <Button
-                  size="lg"
-                  css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
-                  color="error"
-                  onPress={() => {
-                    setEditionModal(true);
-                    
-                   
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    gap: "1rem",
                   }}
                 >
-                  Update
-                </Button>
-                <Button
-                  color="primary"
-                  size="lg"
-                  css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
-                  onClick={() => {
-                   
-                    closeHandler();
-                  }}
-                >
-                  Go back
-                </Button>
+                  <Button
+                    size="lg"
+                    css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
+                    color="error"
+                    onPress={() => {
+                      setEditionModal(true);
+                    }}
+                  >
+                    Update
+                  </Button>
+                  <Button
+                    color="primary"
+                    size="lg"
+                    css={{ width: "15%", margin: "0 auto", marginTop: "1rem" }}
+                    onClick={() => {
+                      closeHandler();
+                    }}
+                  >
+                    Go back
+                  </Button>
                 </div>
               </Card>
             )}
@@ -560,48 +550,48 @@ const List = () => {
                   </Text>
                 </div>
 
-                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-evenly',gap:'1rem'}}>
-                <Button
-                  color="error"
+                <div
                   style={{
-                    width: "20%",
-                    margin: "0 auto",
-                    fontSize: "1.2rem",
-                   
-                  }}
-                  onClick={() => {
-                    if(!checkfornewPhone()){
-                       
-                      submitToFirestore();
-                      setModified(true);
-                    window.location.reload();
-                  }
-                  else{
-                    renderOtpVerification();
-                      setotphandlervisible(true);
-                  }
-                   
-                    
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    gap: "1rem",
                   }}
                 >
-                  confirm
-                </Button>
-                <Button
-                  color="primary"
-                  style={{
-                    width: "20%",
-                    margin: "0 auto",
-                    fontSize: "1.2rem",
-                   
-                  }}
-                  onClick={() => {
-                    setModified(false);
-                    setEditionModal(false);
-                  }}
-                >
-                  Go back
-                </Button>
-               
+                  <Button
+                    color="error"
+                    style={{
+                      width: "20%",
+                      margin: "0 auto",
+                      fontSize: "1.2rem",
+                    }}
+                    onClick={() => {
+                      if (!checkfornewPhone()) {
+                        submitToFirestore();
+                        setModified(true);
+                      } else {
+                        renderOtpVerification();
+                        setotphandlervisible(true);
+                      }
+                    }}
+                  >
+                    confirm
+                  </Button>
+                  <Button
+                    color="primary"
+                    style={{
+                      width: "20%",
+                      margin: "0 auto",
+                      fontSize: "1.2rem",
+                    }}
+                    onClick={() => {
+                      setModified(false);
+
+                      setEditionModal(false);
+                    }}
+                  >
+                    Go back
+                  </Button>
                 </div>
               </Card>
             )}
@@ -659,35 +649,43 @@ const List = () => {
                   </Text>
                 </div>
 
-                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-around'}}>
-                <Button color="primary"
+                <div
                   style={{
-                    width: "20%",
-                    fontSize: "1.25rem",
-                    
-                    color: "white",
-                    margin: "0 auto",
-                  }}
-                  onClick={closedelModalHandler}
-                >
-                  Go back
-                </Button>
-                <Button color="success"
-                  style={{
-                    width: "20%",
-                    fontSize: "1.25rem",
-                   
-                    color: "white",
-                    margin:'0 auto',
-                    marginLeft:'1.5rem'
-                  }}
-                  onClick={() => {
-                    deleteHandler();
-                    window.location.reload();
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
                   }}
                 >
-                  Confirm
-                </Button>
+                  <Button
+                    color="primary"
+                    style={{
+                      width: "20%",
+                      fontSize: "1.25rem",
+
+                      color: "white",
+                      margin: "0 auto",
+                    }}
+                    onClick={closedelModalHandler}
+                  >
+                    Go back
+                  </Button>
+                  <Button
+                    color="success"
+                    style={{
+                      width: "20%",
+                      fontSize: "1.25rem",
+
+                      color: "white",
+                      margin: "0 auto",
+                      marginLeft: "1.5rem",
+                    }}
+                    onClick={() => {
+                      deleteHandler();
+                      window.location.reload();
+                    }}
+                  >
+                    Confirm
+                  </Button>
                 </div>
               </Card>
             )}
@@ -718,40 +716,61 @@ const List = () => {
           </Modal.Body>
         </Modal>
         <div id="recaptcha-container"></div>
-       
-          <Modal
-            closeButton
-            aria-labelledby="modal-title"
-            open={otphandlervisible}
-            onClose={otpcloseHandler}
-            width="30vw"
-          >
-            <Modal.Body>
-              <Input
-                label="OTP"
-                placeholder="XXXXXX"
-                onChange={(event) => {
-                  setOtp(event.target.value);
-                }}
-              ></Input>
-              <Button
-                color="primary"
-                css={{  width:'40%',margin:'0 auto', marginTop:'1rem',marginBottom:'1rem' }}
-                onPress={() => {
-                  validateOtp();
-                  
-                }}
-              >
-                Submit
-              </Button>
-              <p style={{color:'red',marginTop:'1rem', fontSize:'1.2rem', textTransform:'uppercase',textAlign:'center'}}>{otpText}</p>
-             
-            </Modal.Body>
-          </Modal>
-          
-              
-          <p style={{color:'red',marginTop:'1rem', fontSize:'1.5rem', textTransform:'uppercase',textAlign:'center'}}>{requestMessage}</p>
-       
+
+        <Modal
+          closeButton
+          aria-labelledby="modal-title"
+          open={otphandlervisible}
+          onClose={otpcloseHandler}
+          width="30vw"
+        >
+          <Modal.Body>
+            <Input
+              label="OTP"
+              placeholder="XXXXXX"
+              onChange={(event) => {
+                setOtp(event.target.value);
+              }}
+            ></Input>
+            <Button
+              color="primary"
+              css={{
+                width: "40%",
+                margin: "0 auto",
+                marginTop: "1rem",
+                marginBottom: "1rem",
+              }}
+              onPress={() => {
+                validateOtp();
+              }}
+            >
+              Submit
+            </Button>
+            <p
+              style={{
+                color: "red",
+                marginTop: "1rem",
+                fontSize: "1.2rem",
+                textTransform: "uppercase",
+                textAlign: "center",
+              }}
+            >
+              {otpText}
+            </p>
+          </Modal.Body>
+        </Modal>
+
+        <p
+          style={{
+            color: "red",
+            marginTop: "1rem",
+            fontSize: "1.5rem",
+            textTransform: "uppercase",
+            textAlign: "center",
+          }}
+        >
+          {requestMessage}
+        </p>
       </div>
     );
   }
